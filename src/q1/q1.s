@@ -15,17 +15,15 @@ fac_asm:
 
   // r (accumulateur) dans rbx
   mov $1, %rbx
-  // i (compteur) dans rcx
-  mov $2, %rcx
 
 fac_loop:
   // Si i > x (i - x > 0)
-  cmp %rax, %rcx
-  jg fac_endloop
+  cmp $1, %rax
+  jle fac_endloop
 
   // S i <= x, r = r * i
-  imul %rcx, %rbx
-  add $1, %rcx
+  imul %rax, %rbx
+  sub $1, %rax
   jmp fac_loop
 
 fac_endloop:

@@ -29,13 +29,27 @@ void display_dumber(struct dumber d) {
   printf("Oui c'est un copie : %p !\n", &d);
 }
 
+int strlen_dumb_asm(const char *str, unsigned int max) {
+  int size;
+
+  __asm__ volatile(
+    "call strlen_dumb"
+    : "=a" (size)
+    : "D" (str), "S" (max)
+    : "memory"
+  );
+
+  return size;
+}
+
 int main(int argc, char *argv[]) {
   int size;
   printf("argc = %d, argv = %p\n", argc, argv);
   char str[] = "I love tls-secte";
 
   // Calcul de la taille de str à l'aide de strlen_dumb
-  size = strlen_dumb(&str[0], 0x20);
+  //size = strlen_dumb(&str[0], 0x20);
+  size = strlen_dumb_asm(&str[0], 0x20);
 
   printf("\"%s\" string is 0x%08x bytes long\n", &str[0], size);
 

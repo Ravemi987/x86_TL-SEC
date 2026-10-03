@@ -48,7 +48,6 @@ int main(int argc, char *argv[]) {
   char str[] = "I love tls-secte";
 
   // Calcul de la taille de str à l'aide de strlen_dumb
-  //size = strlen_dumb(&str[0], 0x20);
   size = strlen_dumb_asm(&str[0], 0x20);
 
   printf("\"%s\" string is 0x%08x bytes long\n", &str[0], size);
@@ -60,7 +59,19 @@ int main(int argc, char *argv[]) {
     .c12 = 0xc, .c13 = 0xd, .c14 = 0xe, .c15 = 0xf,
   };
   printf("Est-ce une copie :   %p ?\n", &d);
-  display_dumber(d);
 
+  __asm__ volatile(
+    "subq %[s], %%rsp\n\t"
+    "movq %[s], %%rcx\n\t"
+    "leaq %[src], %%rsi\n\t"
+    "movq %%rsp, %%rdi\n\t"
+    "cld\n\t"
+    "rep movsb\n\t"
+    "call display_dumber\n\t"
+    "addq %[s], %%rsp\n\t"
+    :: [src] "m" (d), [s] "r" (sizeof(d))
+    : "memory", "rsi", "rdi", "rcx", "rax", "rdx", "r8", "r9", "r10", "r11"
+  );
+  
   return 0;
 }
